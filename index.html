@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos de Google Sheets</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Datos de la Hoja de Google Sheets</h1>
+    <div id="data-container">
+    </div>
+
+    <h2>Gráfico 1</h2>
+    <div class="chart-container">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQM4fcje-jEs0-iW1niWSxevPoeXSTiDvN0bmvzhAmK3sX6ooRutOZgo-bLk5RY3AQ827NVRa8LPUTx/pubchart?oid=1803499520&format=interactive" width="600" height="450" frameborder="0"></iframe>
+    </div>
+
+    <h2>Gráfico 2</h2>
+    <div class="chart-container">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQM4fcje-jEs0-iW1niWSxevPoeXSTiDvN0bmvzhAmK3sX6ooRutOZgo-bLk5RY3AQ827NVRa8LPUTx/pubchart?oid=923206154&format=interactive" width="600" height="450" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        function loadData() {
+            // URL de la hoja de Google Sheets publicada como TSV
+            const tsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQM4fcje-jEs0-iW1niWSxevPoeXSTiDvN0bmvzhAmK3sX6ooRutOZgo-bLk5RY3AQ827NVRa8LPUTx/pub?output=tsv";
+
+            // Función para cargar y procesar datos TSV
+            function processTSVData(tsvUrl, callback) {
+                fetch(tsvUrl)
+                    .then(response => response.text())
+                    .then(data => {
+                        const lines = data.trim().split('\n');
+                        if (lines.length > 0) {
+                            const headers = lines[0].split('\t');
+                            const dataRows = lines.slice(1).map(line => line.split('\t'));
+                            callback(headers, dataRows);
+                        } else {
+                            console.error("No se encontraron datos en el TSV:", tsvUrl);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar el TSV:", tsvUrl, error);
+                    });
+            }
+
+            // Cargar y mostrar la tabla
+            processTSVData(tsvUrl, (headers, dataRows) => {
+                let tableHTML = '<table><thead><tr>';
+                headers.forEach(header => {
+                    tableHTML += `<th>${header}</th>`;
+                });
+                tableHTML += '</tr></thead><tbody>';
+
+                dataRows.forEach(rowData => {
+                    tableHTML += '<tr>';
+                    rowData.forEach(cellData => {
+                        tableHTML += `<td>${cellData}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody></table>';
+                document.getElementById('data-container').innerHTML = tableHTML;
+            });
+        }
+
+        // Cargar los datos cuando la página se cargue
+        window.onload = loadData;
+
+        // Actualizar los datos cada 5 segundos
+        setInterval(loadData, 5000);
+    </script>
+
+    <a href="/UASD.html">
+    <button type="button">Version mejorada</button>
+</a>
+
+</body>
+</html>
